@@ -1,0 +1,21 @@
+# Sistema Web - Práctica de Maestría
+
+Este proyecto es una aplicación full-stack que incluye un servidor backend y una interfaz frontend, orquestados mediante Docker.
+
+## 🚀 Tecnologías Utilizadas
+
+* **Frontend:** React + Vite, TypeScript
+* **Backend:** Node.js, Express, Prisma ORM
+* **Contenedores:** Docker, Docker Compose
+* **CI/CD:** GitHub Actions
+
+## 📁 Estructura del Proyecto
+
+```text
+SISTEMA WEB/
+├── .github/workflows/  # Pipelines de GitHub Actions
+├── backend/           # Código fuente del servidor
+├── frontend/          # Código fuente de la interfaz de usuario
+├── .gitignore         # Archivos ignorados por Git
+├── docker-compose.yml # Configuración de contenedores
+└── README.md          # Documentación del proyecto
