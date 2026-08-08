@@ -20,7 +20,7 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import {
-  IconPlus,
+  
   IconPencil,
   IconTrash,
   IconUserPlus,
