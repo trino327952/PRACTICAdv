@@ -70,7 +70,7 @@ export const UserCrud: React.FC = () => {
       }
       const data = await res.json();
       setUsers(data);
-    } catch (err: any) {
+    } catch {
       setError(
         'No se pudo conectar con el servidor backend (http://localhost:3001). Asegúrate de tener corriendo el servidor Fastify y la base de datos PostgreSQL.'
       );

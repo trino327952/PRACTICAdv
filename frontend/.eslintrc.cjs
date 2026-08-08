@@ -5,15 +5,15 @@ module.exports = {
     es2020: true,
     node: true,
   },
+  parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint'],
   extends: [
     'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
   ],
   ignorePatterns: ['dist', 'node_modules', '.eslintrc.cjs'],
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-  },
   rules: {
-    'no-unused-vars': 'warn',
+    '@typescript-eslint/no-unused-vars': 'warn',
+    '@typescript-eslint/no-explicit-any': 'off',
   },
 };
