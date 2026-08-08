@@ -1,0 +1,64 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validar-backend:
+    name: Validar Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Instalar dependencias del backend
+        working-directory: ./backend
+        run: |
+          npm ci
+          npx prisma generate
+
+      - name: Ejecutar pruebas del backend
+        working-directory: ./backend
+        run: npm test --if-present
+
+      - name: Validar calidad del código del backend
+        working-directory: ./backend
+        run: npm run lint --if-present
+
+      - name: Construir el backend
+        working-directory: ./backend
+        run: npm run build --if-present
+
+  validar-frontend:
+    name: Validar Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Instalar dependencias del frontend
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Construir el frontend
+        working-directory: ./frontend
+        run: npm run build
