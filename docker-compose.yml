@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgres:17
+    container_name: practica_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: practica_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: practica_backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://postgres:admin123@db:5432/practica_db?schema=public
+      PORT: 3000
+      HOST: 0.0.0.0
+    ports:
+      - "3001:3000"
+    depends_on:
+      - db
+    
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: practica_frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: http://localhost:3001
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

@@ -1,0 +1,20 @@
+# Ignorar dependencias de ambos proyectos
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# Ignorar variables de entorno y credenciales
+.env
+*.env
+backend/.env
+
+# Ignorar archivos de compilación / build
+frontend/dist/
+frontend/build/
+backend/dist/
+backend/build/
+
+# Ignorar archivos del sistema y comprimidos
+*.zip
+*.log
+.DS_Store
