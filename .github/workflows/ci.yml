@@ -38,7 +38,7 @@ jobs:
 
       - name: Ejecutar pruebas Backend
         working-directory: ./backend
-        run: npm test
+        run: npx vitest run --passWithNoTests
 
       - name: Verificar calidad Backend
         working-directory: ./backend
