@@ -30,6 +30,7 @@ jobs:
       - name: Instalar dependencias Backend
         working-directory: ./backend
         run: npm ci
+       
 
       - name: Generar cliente Prisma
         working-directory: ./backend
@@ -37,7 +38,7 @@ jobs:
 
       - name: Ejecutar pruebas Backend
         working-directory: ./backend
-        run: npm test --if-present
+        run: npm test
 
       - name: Verificar calidad Backend
         working-directory: ./backend
