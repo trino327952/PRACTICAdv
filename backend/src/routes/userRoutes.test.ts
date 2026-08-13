@@ -587,7 +587,7 @@ describe('API de Usuarios - /api/users', () => {
       url: '/api/users/1',
     });
 
-    expect(response.statusCode).toBe(200);
+    expect(response.statusCode).toBe(200);//cambio intencional
 
     expect(response.json()).toEqual({
       message:
