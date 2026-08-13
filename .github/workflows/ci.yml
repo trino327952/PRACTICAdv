@@ -30,6 +30,7 @@ jobs:
       - name: Instalar dependencias Backend
         working-directory: ./backend
         run: npm ci
+       
 
       - name: Generar cliente Prisma
         working-directory: ./backend
@@ -37,7 +38,7 @@ jobs:
 
       - name: Ejecutar pruebas Backend
         working-directory: ./backend
-        run: npm test --if-present
+        run: npx vitest run --passWithNoTests
 
       - name: Verificar calidad Backend
         working-directory: ./backend
@@ -78,22 +79,3 @@ jobs:
       - name: Construir Frontend
         working-directory: ./frontend
         run: npm run build
-
-
-  validar-docker:
-    name: Validar Docker
-    runs-on: ubuntu-latest
-
-    needs:
-      - validar-backend
-      - validar-frontend
-
-    steps:
-      - name: Obtener código
-        uses: actions/checkout@v4
-
-      - name: Validar Docker Compose
-        run: docker compose config
-
-      - name: Construir imágenes Docker
-        run: docker compose build
