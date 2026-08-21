@@ -13,23 +13,16 @@ pipeline {
     }
 
     environment {
-        // Tu usuario de Docker Hub actualizado
-        DOCKER_USER = 'vicente327'
+        LOCAL_BACKEND_IMAGE  = 'proyecto-integrador-u3-backend'
+        LOCAL_FRONTEND_IMAGE = 'proyecto-integrador-u3-frontend'
 
-        // Nombres locales y remotos para los contenedores Docker
-        LOCAL_BACKEND_IMAGE   = 'proyecto-backend'
-        LOCAL_FRONTEND_IMAGE  = 'proyecto-frontend'
         REMOTE_BACKEND_IMAGE  = 'proyecto-integrador-backend'
         REMOTE_FRONTEND_IMAGE = 'proyecto-integrador-frontend'
 
-        // URL del microservicio del backend en Railway
-        PUBLIC_BACKEND_URL    = 'https://railway.app'
-
-        // Identificadores de infraestructura extraídos de tu consola
-        RAILWAY_PROJECT_ID           = '37075425-4ea0-4f1a-a5fb-e49455eb4174'
-        RAILWAY_ENVIRONMENT_ID       = '64907db1-12c4-4b21-91c4-20dbcc8acab9'
-        RAILWAY_BACKEND_SERVICE_ID   = '92fe0ca7-47b4-4cda-9f07-f791e68c7d55'
-        RAILWAY_FRONTEND_SERVICE_ID  = '2a6e2269-b339-4078-aa38-5300ce07491c'
+        RAILWAY_PROJECT_ID = '6c759af0-9895-4a99-8b00-bf4642281129'
+        RAILWAY_ENVIRONMENT_ID = 'efdd7c0a-1fa7-4d3a-89d0-f7647e948c4c'
+        RAILWAY_BACKEND_SERVICE_ID = '5c52cc15-b575-488a-969e-c35bacee17c0'
+        RAILWAY_FRONTEND_SERVICE_ID = '4c049b51-26d5-4b82-bf0b-2534c80c888c'
     }
 
     stages {
@@ -44,25 +37,6 @@ pipeline {
             steps {
                 dir('backend') {
                     sh 'npm ci'
-                }
-            }
-        }
-
-        stage('Configuración DB') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'Railway-Postgres',
-                                                  usernameVariable: 'DB_USER',
-                                                  passwordVariable: 'DB_PASS')]) {
-                    sh '''
-                        set -eu
-
-                        echo "========================================"
-                        echo "CONFIGURACIÓN DE BASE DE DATOS"
-                        echo "========================================"
-
-                        export DATABASE_URL="postgresql://${DB_USER}:${DB_PASS}@containers-us-west-123.railway.app:5432/railway?schema=public"
-                        echo "Variable DATABASE_URL configurada para Railway PostgreSQL"
-                    '''
                 }
             }
         }
@@ -139,7 +113,7 @@ pipeline {
                 withCredentials([
                     usernamePassword(
                         credentialsId: 'jenkins-u3',
-                        usernameVariable: 'DOCKER_USER_CRED',
+                        usernameVariable: 'DOCKER_USER',
                         passwordVariable: 'DOCKER_PASS'
                     )
                 ]) {
@@ -153,13 +127,13 @@ pipeline {
                         export DOCKER_CONFIG="$(mktemp -d)"
                         trap 'rm -rf "$DOCKER_CONFIG"' EXIT
 
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER_CRED" --password-stdin
+                        echo "$DOCKER_PASS" | docker login                             -u "$DOCKER_USER"                             --password-stdin
 
-                        BACKEND_LATEST="${DOCKER_USER_CRED}/${REMOTE_BACKEND_IMAGE}:latest"
-                        BACKEND_BUILD="${DOCKER_USER_CRED}/${REMOTE_BACKEND_IMAGE}:${BUILD_NUMBER}"
+                        BACKEND_LATEST="${DOCKER_USER}/${REMOTE_BACKEND_IMAGE}:latest"
+                        BACKEND_BUILD="${DOCKER_USER}/${REMOTE_BACKEND_IMAGE}:${BUILD_NUMBER}"
 
-                        FRONTEND_LATEST="${DOCKER_USER_CRED}/${REMOTE_FRONTEND_IMAGE}:latest"
-                        FRONTEND_BUILD="${DOCKER_USER_CRED}/${REMOTE_FRONTEND_IMAGE}:${BUILD_NUMBER}"
+                        FRONTEND_LATEST="${DOCKER_USER}/${REMOTE_FRONTEND_IMAGE}:latest"
+                        FRONTEND_BUILD="${DOCKER_USER}/${REMOTE_FRONTEND_IMAGE}:${BUILD_NUMBER}"
 
                         docker tag "${LOCAL_BACKEND_IMAGE}:latest" "$BACKEND_LATEST"
                         docker tag "${LOCAL_BACKEND_IMAGE}:latest" "$BACKEND_BUILD"
@@ -175,7 +149,7 @@ pipeline {
 
                         docker logout
 
-                        echo "Imágenes publicadas correctamente en Docker Hub como vicente327."
+                        echo "Imágenes publicadas correctamente en Docker Hub."
                     '''
                 }
             }
@@ -206,7 +180,7 @@ pipeline {
                         echo "REDEPLOY BACKEND EN RAILWAY"
                         echo "========================================"
 
-                        npx -y @railway/cli redeploy --service "$RAILWAY_BACKEND_SERVICE_ID" --environment "$RAILWAY_ENVIRONMENT_ID" --yes
+                        npx -y @railway/cli redeploy                             --service "$RAILWAY_BACKEND_SERVICE_ID"                             --environment "$RAILWAY_ENVIRONMENT_ID"                             --yes
 
                         echo "Redeploy del backend solicitado correctamente."
                     '''
@@ -229,7 +203,7 @@ pipeline {
                         echo "REDEPLOY FRONTEND EN RAILWAY"
                         echo "========================================"
 
-                        npx -y @railway/cli redeploy --service "$RAILWAY_FRONTEND_SERVICE_ID" --environment "$RAILWAY_ENVIRONMENT_ID" --yes
+                        npx -y @railway/cli redeploy                             --service "$RAILWAY_FRONTEND_SERVICE_ID"                             --environment "$RAILWAY_ENVIRONMENT_ID"                             --yes
 
                         echo "Redeploy del frontend solicitado correctamente."
                     '''
@@ -246,7 +220,7 @@ pipeline {
             echo 'Backend probado correctamente'
             echo 'Frontend validado y construido'
             echo 'Imágenes Docker construidas'
-            echo 'Imágenes publicadas en Docker Hub bajo el perfil vicente327'
+            echo 'Imágenes publicadas en Docker Hub'
             echo 'Redeploy solicitado para Backend en Railway'
             echo 'Redeploy solicitado para Frontend en Railway'
         }
@@ -255,8 +229,11 @@ pipeline {
             echo '========================================'
             echo 'PIPELINE FALLIDO'
             echo '========================================'
-            echo 'Revisar la primera etapa fallida y su consola de depuración.'
+            echo 'Revisar la primera etapa fallida y su Console Output.'
+        }
+
+        always {
+            sh 'docker logout >/dev/null 2>&1 || true'
         }
     }
 }
-
