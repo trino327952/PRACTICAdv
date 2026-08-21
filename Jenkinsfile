@@ -40,7 +40,24 @@ pipeline {
                 }
             }
         }
+stage('Configuración DB') {
+    steps {
+        withCredentials([usernamePassword(credentialsId: 'Railway-Postgres',
+                                          usernameVariable: 'DB_USER',
+                                          passwordVariable: 'DB_PASS')]) {
+            sh '''
+                set -eu
 
+                echo "========================================"
+                echo "CONFIGURACIÓN DE BASE DE DATOS"
+                echo "========================================"
+
+                export DATABASE_URL="postgresql://${DB_USER}:${DB_PASS}@containers-us-west-123.railway.app:5432/railway?schema=public"
+                echo "Variable DATABASE_URL configurada para Railway PostgreSQL"
+            '''
+        }
+    }
+}
         stage('Backend - Prisma') {
             steps {
                 dir('backend') {
